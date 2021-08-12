@@ -11,27 +11,30 @@ class PlayerService:
         
     def get_players(self):
         players_cursor = Player.objects.aggregate(
-            [{ "$project": { "_id": 0 }}]
+            [{ "$project": { 
+                "_id": 0,
+                "Player": "$playerName",
+                "Team": "$teamAbbreviation",
+                "Pos": "$playerPostion",
+                "Att": "$rushingAttempts",
+                "Att/G": "$rushingAttG",
+                "Yds": "$rushingYards",
+                "Avg": "$rushingAvg",
+                "Yds/G": "$rushingYdsG",
+                "TD": "$rushingTouchdowns",
+                "Lng": "$rushingLongest",
+                "1st": "$rushingFD",
+                "1st%": "$rushingFDP",
+                "20+": "$rushing20plus",
+                "40+": "$rushing40plus",
+                "FUM": "$rushingFUM"
+             }}]
         )
         return loads(dumps(players_cursor))
     
     def create_players(self, player_json):
         player = Player(
-            playerName= player_json['Player'],
-            teamAbbreviation= player_json['Team'],
-            playerPostion= player_json['Pos'],
-            rushingAttempts= player_json['Att'],
-            rushingAttG= player_json['Att/G'],
-            rushingYards= player_json['Yds'],
-            rushingAvg= player_json['Avg'],
-            rushingYdsG= player_json['Yds/G'],
-            rushingTouchdowns= player_json['TD'],
-            rushingLongest= player_json['Lng'],
-            rushingFD= player_json['1st'],
-            rushingFDP= player_json['1st%'],
-            rushing20plus= player_json['20+'],
-            rushing40plus= player_json['40+'],
-            rushingFUM= player_json['FUM']
+
         ).save()
 
     def update_players(self, player):
