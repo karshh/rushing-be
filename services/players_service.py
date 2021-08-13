@@ -10,17 +10,18 @@ class PlayerService:
             self.data = json.load(f)
         
     
-    def get_players(self, filterName, sortName, sortDirection):
+    def get_players(self, filterName, sortColumn, sortDirection):
         pipeline = [
             { "$project": { "_id": 0 }}
         ]
-        if sortName != 'Lng':  pipeline.append({ "$sort": { sortName: int(sortDirection) }})
+        if sortColumn != 'Lng':
+            pipeline.append({ "$sort": { sortColumn: int(sortDirection) }})
         players_cursor = Player.objects(playerName__icontains=filterName).aggregate(pipeline)
         players = loads(dumps(players_cursor))
-        print(players)
-        if sortName == 'Lng':
+        if sortColumn == 'Lng':
             players.sort(
-                key=lambda x: int(str(x['Lng']).replace('T', '')), reverse=int(sortDirection) < 0
+                key=lambda x: int(str(x['Lng']).replace('T', '')),
+                reverse=int(sortDirection) < 0
             )
         return players
     
