@@ -10,12 +10,9 @@ class PlayerService:
             self.data = json.load(f)
         
     
-    def get_players(self):
-        players_cursor = Player.objects.aggregate(
-            [{ "$project": { 
-                "_id": 0
-             }}]
-        )
+    def get_players(self, filterName):
+        pipeline = [{ "$project": { "_id": 0 }}]
+        players_cursor = Player.objects(playerName__icontains=filterName).aggregate(pipeline)
         return loads(dumps(players_cursor))
     
     def create_players(self, player_json):

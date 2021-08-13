@@ -5,15 +5,9 @@ from database.db import initialize_db
 
 app = Flask(__name__)
 
-
+# Initialize DB
 app.config['MONGODB_SETTINGS'] = {
     'host': MONGO_URL,
     'connect': False
 }
 initialize_db(app)
-
-from controllers.players_controller import players
-
-app.register_blueprint(players, url_prefix='/players')
-if __name__ == '__main__':
-    app.run()

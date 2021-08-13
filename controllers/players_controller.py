@@ -6,7 +6,9 @@ players = Blueprint('players', __name__)
 
 @players.route('/')
 def get_players():
-    return jsonify(player_service.get_players())
+
+    filterName = request.args.get('filter')
+    return jsonify(player_service.get_players(filterName))
 
 @players.route('/', methods=['PUT'])
 def create_players():
