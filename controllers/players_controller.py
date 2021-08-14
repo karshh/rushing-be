@@ -10,8 +10,10 @@ def get_players():
     filterName = request.args.get('filter') or ''
     sortColumn = request.args.get('sortColumn') or 'Player'
     sortDirection = request.args.get('sortDirection') or 1
+    skip = request.args.get('skip')
+    limit = request.args.get('limit')
     return jsonify(
-        player_service.get_players(filterName, sortColumn, sortDirection)
+        player_service.get_players(filterName, sortColumn, sortDirection, skip, limit)
     )
 
 @players.route('/', methods=['PUT'])
