@@ -27,9 +27,11 @@ class PlayerService:
         players = loads(dumps(player_cursor))
         if sortColumn == 'Lng':
             players.sort(
-                key=lambda x: int(str(x['Lng']).replace('T', '')),
+                key=lambda x: (int(str(x['Lng']).replace('T', '')), str(x['Lng']).find('T')),
                 reverse=int(sortDirection) < 0
             )
+            if skip and limit:
+                players = players[int(skip):int(skip)+int(limit)]
         return {
             'size': size,
             'players': players
