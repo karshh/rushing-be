@@ -16,11 +16,8 @@ def get_players():
         player_service.get_players(filterName, sortColumn, sortDirection, skip, limit)
     )
 
-@players.route('/', methods=['PUT'])
+@players.route('/upload', methods=['POST'])
 def create_players():
     data = request.get_json()
-    try:
-        result = player_service.create_players(data)
-    except KeyError as e:
-            return {'code': 'MISSING_VALUE', 'variable': e.args[0]}, 400
-    return '', 204
+    result = player_service.upload_players(data)
+    return jsonify(None)
