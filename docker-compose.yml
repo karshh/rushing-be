@@ -1,11 +1,11 @@
 services:
-  flask:
+  rushing-be:
     build: .
     command: python -m main
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
+      - .:/rushing-be
   mongodb:
     image: mongo:4.2.0
     ports:
