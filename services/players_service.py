@@ -2,17 +2,13 @@ import json
 from bson.json_util import dumps, loads
 from flask.json import jsonify
 from database.player import Player
-import locale
-
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 class PlayerService:
 
     def __init__(self):
         with open('./rushing.json') as f:
             self.data = json.load(f)
-        
-    
+
     def get_players(self, filterName, sortColumn, sortDirection, skip, limit):
         pipeline = [{ "$project": { "_id": 0 }}]
 
@@ -39,13 +35,12 @@ class PlayerService:
             'size': size,
             'players': players
         }
-    
+
     def upload_players(self, player_json):
         current_players = Player.objects()
         
         players = []
         for new_player in player_json:
-            print("checking " + new_player.get('Player'))
             player = Player(
                 playerName = new_player.get('Player'),
                 teamAbbreviation = new_player.get('Team'),
@@ -67,9 +62,10 @@ class PlayerService:
             players.append(player)
         current_players.delete()
         Player.objects.insert(players)
-    
-    def _convert_to_int(self, value):
+
+    @staticmethod
+    def _convert_to_int(value):
         if type(value) is int:
             return value
         else:
-            return locale.atoi(value)
+            return int(str(value).replace(',', ''))
