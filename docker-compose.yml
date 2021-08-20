@@ -5,7 +5,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/rushing-be
+      - .:/app
   mongodb:
     image: mongo:4.2.0
     ports:
