@@ -38,7 +38,6 @@ class PlayerService:
 
     def upload_players(self, player_json):
         current_players = Player.objects()
-        
         players = []
         for new_player in player_json:
             player = Player(
