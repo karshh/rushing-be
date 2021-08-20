@@ -1,13 +1,8 @@
-import json
 from bson.json_util import dumps, loads
 from flask.json import jsonify
 from database.player import Player
 
 class PlayerService:
-
-    def __init__(self):
-        with open('./rushing.json') as f:
-            self.data = json.load(f)
 
     def get_players(self, filterName, sortColumn, sortDirection, skip, limit):
         pipeline = [{ "$project": { "_id": 0 }}]
