@@ -30,7 +30,11 @@ class PlayerService:
     }
     
     def get_players(self, filterName, sortColumn, sortDirection, skip, limit):
+        assert sortColumn, 'sortColumn is None'
+        assert sortDirection == '1' or sortDirection == '-1', 'sortDirection is None or invalid'
+        
         pipeline = []
+
         player_objects = Player.objects(playerName__icontains=filterName)
         size = player_objects.count()
         

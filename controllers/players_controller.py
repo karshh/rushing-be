@@ -9,7 +9,7 @@ def get_players():
 
     filterName = request.args.get('filter') or ''
     sortColumn = request.args.get('sortColumn') or 'Player'
-    sortDirection = request.args.get('sortDirection') or 1
+    sortDirection = request.args.get('sortDirection') or '1'
     skip = request.args.get('skip')
     limit = request.args.get('limit')
     return jsonify(
