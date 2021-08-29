@@ -19,11 +19,13 @@ The following 2 ways can be used to run the application in development.
 - Activate the virtual environement with `source ./venv/bin/activate`
 - Install all dependencies with `pip install -r requirements.txt`
 - Run `python -m main` to start the server
+- To run unit tests, run `pytest`
 
 **2. docker**
 
 - Update `MONGO_URL` in .env to `mongodb://mongo:27017/rushing`
 - Run `docker-compose build` to build docker images, and `docker-compose up` to start the containers. Alternatively, we can run `docker-compose up --build` to do both.
+
 
 ### Using the App
 
@@ -117,8 +119,3 @@ Once done, push the code to heroku.
 ```
 git push heroku master
 ```
-
-
-
-
-
