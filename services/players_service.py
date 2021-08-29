@@ -1,6 +1,8 @@
 from bson.json_util import dumps, loads
 from flask.json import jsonify
 from database.player import Player
+from flask_mongoengine import ValidationError
+from services.exceptions.load_exception import LoadException
 
 class PlayerService:
 
@@ -70,7 +72,7 @@ class PlayerService:
     def upload_players(self, player_json):
         current_players = Player.objects()
         players = []
-        for new_player in player_json:
+        for idx, new_player in enumerate(player_json):
             player = Player(
                 playerName = new_player.get('Player'),
                 teamAbbreviation = new_player.get('Team'),
@@ -89,7 +91,13 @@ class PlayerService:
                 rushing40plus = new_player.get('40+'),
                 rushingFUM = new_player.get('FUM')
             )
-            player.validate()
+            try:
+                player.validate()
+            except ValidationError as e:
+                key = next((key for key in dbMap if key in e.message), None)
+                if not key:
+                    raise e
+                raise LoadException(idx=idx, variable=dbMap[key])
             players.append(player)
         current_players.delete()
         if players: Player.objects.insert(players)
@@ -100,3 +108,22 @@ class PlayerService:
             return value
         else:
             return int(str(value).replace(',', ''))
+
+
+dbMap = {
+    'playerName': 'Player',
+    'teamAbbreviation': 'Team',
+    'playerPostion': 'Pos',
+    'rushingAttempts': 'Att',
+    'rushingAttG': 'Att/G',
+    'rushingYards': 'Yds',
+    'rushingAvg': 'Avg',
+    'rushingYdsG': 'Yds/G',
+    'rushingTouchdowns': 'TD',
+    'rushingLongest': 'Lng',
+    'rushingFD': '1st',
+    'rushingFDP': '1st%',
+    'rushing20plus': '20+',
+    'rushing40plus': '40+',
+    'rushingFUM': 'FUM'
+}

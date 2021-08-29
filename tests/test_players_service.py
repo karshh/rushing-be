@@ -3,9 +3,11 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 import unittest
 import json
+from bson.json_util import dumps, loads
 from mongoengine import connect, disconnect
 from database.player import Player
 from services import player_service
+from services.exceptions.load_exception import LoadException
 from datetime import datetime
 from settings import TEST_MONGO_URL
 from tests.constants import PLAYERS_RAW_DATA
@@ -963,3 +965,133 @@ class TestPlayersService(unittest.TestCase):
         }
         result = player_service.get_players('ase', 'Lng', '1', None, None)
         assert result == answer
+
+    ############################################
+    #
+    # TESTING player_service.upload_players
+    #
+    ############################################
+    
+    def test_upload_players_assert_invalid_body(self):
+        Player.objects().delete()
+        try:
+            player_service.upload_players([
+                {
+                    "1st": 0,
+                    "1st%": 0.0,
+                    "20+": 0,
+                    "40+": 0,
+                    "Att": 1,
+                    "Att/G": 0.1,
+                    "Avg": 0.0,
+                    "FUM": 1,
+                    "Lng": "0",
+                    "Player": "Drew Kaser",
+                    "Pos": "P",
+                    "TD": 0,
+                    "Team": "SD",
+                    "Yds": 0,
+                    "Yds/G": 0.0
+                },
+                {
+                    "1st": 7,
+                    "1st%": 35.0,
+                    "20+": 0,
+                    "40+": 0,
+                    "Att/G": 2.0,
+                    "Avg": 2.6,
+                    "FUM": 0,
+                    "Lng": "13",
+                    "Player": "Case Keenum",
+                    "Pos": "QB",
+                    "TD": 1,
+                    "Team": "LA",
+                    "Yds": 51,
+                    "Yds/G": 5.1
+                }
+            ])
+            assert False, 'exception not raised'
+        except LoadException as e:
+            assert e.idx == 1
+            assert e.variable == 'Att'
+        except:
+            assert False, 'invalid exception raised'
+
+    
+    def test_upload_players_success(self):
+        Player.objects().delete()
+        player_service.upload_players([
+            {
+                "Player":"Joe Banyard",
+                "Team":"JAX",
+                "Pos":"RB",
+                "Att":2,
+                "Att/G":2,
+                "Yds":7,
+                "Avg":3.5,
+                "Yds/G":7,
+                "TD":0,
+                "Lng":"7",
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            },
+            {
+                "Player":"Shaun Hill",
+                "Team":"MIN",
+                "Pos":"QB",
+                "Att":5,
+                "Att/G":1.7,
+                "Yds":5,
+                "Avg":1,
+                "Yds/G":1.7,
+                "TD":0,
+                "Lng":"9T",
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            }
+        ])
+        players = loads(dumps(Player.objects().aggregate([ { '$project': { '_id': 0 }}])))
+        assert players == [
+            {
+                "Player":"Joe Banyard",
+                "Team":"JAX",
+                "Pos":"RB",
+                "Att":2,
+                "Att/G":2,
+                "Yds":7,
+                "Avg":3.5,
+                "Yds/G":7,
+                "TD":0,
+                "Lng":7,
+                "LngT":False,
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            },
+            {
+                "Player":"Shaun Hill",
+                "Team":"MIN",
+                "Pos":"QB",
+                "Att":5,
+                "Att/G":1.7,
+                "Yds":5,
+                "Avg":1,
+                "Yds/G":1.7,
+                "TD":0,
+                "Lng":9,
+                "LngT":True,
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            }
+        ]

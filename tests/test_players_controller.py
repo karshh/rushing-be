@@ -4,6 +4,7 @@ sys.path.insert(0, myPath + '/../')
 from unittest import TestCase
 from flask_webtest import TestApp
 from main import app
+from bson.json_util import dumps, loads
 from mongoengine import connect, disconnect
 from database.player import Player
 from settings import TEST_MONGO_URL
@@ -948,3 +949,134 @@ class TestPlayersController(TestCase):
         assert r.status_int == 200
         assert r.content_type == 'application/json'
         assert r.json == answer
+
+    ############################################
+    #
+    # TESTING POST /players/upload
+    #
+    ############################################
+    
+    def test_upload_players_assert_invalid_body(self):
+        Player.objects().delete()
+        r = self.w.post_json('/players/upload', [
+                {
+                    "1st": 0,
+                    "1st%": 0.0,
+                    "20+": 0,
+                    "40+": 0,
+                    "Att": 1,
+                    "Att/G": 0.1,
+                    "Avg": 0.0,
+                    "FUM": 1,
+                    "Lng": "0",
+                    "Player": "Drew Kaser",
+                    "Pos": "P",
+                    "TD": 0,
+                    "Team": "SD",
+                    "Yds": 0,
+                    "Yds/G": 0.0
+                },
+                {
+                    "1st": 7,
+                    "1st%": 35.0,
+                    "20+": 0,
+                    "40+": 0,
+                    "Att/G": 2.0,
+                    "Avg": 2.6,
+                    "FUM": 0,
+                    "Lng": "13",
+                    "Player": "Case Keenum",
+                    "Pos": "QB",
+                    "TD": 1,
+                    "Team": "LA",
+                    "Yds": 51,
+                    "Yds/G": 5.1
+                }
+            ], expect_errors = True)
+        assert r is not None
+        assert r.status_int == 400
+        assert r.content_type == 'application/json'
+        assert r.json == { 'arrayIndex': 1, 'errorVariable': 'Att' }
+
+    
+    def test_upload_players_success(self):
+        Player.objects().delete()
+        r1 = self.w.post_json('/players/upload', [
+            {
+                "Player":"Joe Banyard",
+                "Team":"JAX",
+                "Pos":"RB",
+                "Att":2,
+                "Att/G":2,
+                "Yds":7,
+                "Avg":3.5,
+                "Yds/G":7,
+                "TD":0,
+                "Lng":"7",
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            },
+            {
+                "Player":"Shaun Hill",
+                "Team":"MIN",
+                "Pos":"QB",
+                "Att":5,
+                "Att/G":1.7,
+                "Yds":5,
+                "Avg":1,
+                "Yds/G":1.7,
+                "TD":0,
+                "Lng":"9T",
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            }
+        ])
+        assert r1 is not None
+        assert r1.status_int == 200
+        assert r1.text == ''
+        
+        players = loads(dumps(Player.objects().aggregate([ { '$project': { '_id': 0 }}])))
+        assert players == [
+            {
+                "Player":"Joe Banyard",
+                "Team":"JAX",
+                "Pos":"RB",
+                "Att":2,
+                "Att/G":2,
+                "Yds":7,
+                "Avg":3.5,
+                "Yds/G":7,
+                "TD":0,
+                "Lng":7,
+                "LngT":False,
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            },
+            {
+                "Player":"Shaun Hill",
+                "Team":"MIN",
+                "Pos":"QB",
+                "Att":5,
+                "Att/G":1.7,
+                "Yds":5,
+                "Avg":1,
+                "Yds/G":1.7,
+                "TD":0,
+                "Lng":9,
+                "LngT":True,
+                "1st":0,
+                "1st%":0,
+                "20+":0,
+                "40+":0,
+                "FUM":0
+            }
+        ]

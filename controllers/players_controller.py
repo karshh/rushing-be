@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 from services import player_service
 import json
+from services.exceptions.load_exception import LoadException
 
 players = Blueprint('players', __name__)
 
@@ -23,5 +24,8 @@ def get_players():
 @players.route('/upload', methods=['POST'])
 def create_players():
     data = request.get_json()
-    result = player_service.upload_players(data)
-    return jsonify(None)
+    try:
+        result = player_service.upload_players(data)
+    except LoadException as e:
+        return { 'arrayIndex': e.idx, 'errorVariable': e.variable }, 400
+    return ''
