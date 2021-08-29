@@ -30,8 +30,20 @@ class PlayerService:
     }
     
     def get_players(self, filterName, sortColumn, sortDirection, skip, limit):
-        assert sortColumn, 'sortColumn is None'
-        assert sortDirection == '1' or sortDirection == '-1', 'sortDirection is None or invalid'
+        if sortDirection not in ['-1', '1']:
+            raise ValueError('INVALID_SORT_DIRECTION')
+        if sortColumn not in ['Player', 'Yds', 'Lng', 'TD']:
+            raise ValueError('INVALID_SORT_COLUMN')
+        if skip:
+            try:
+                int(skip)
+            except:
+                raise ValueError('INVALID_SKIP')
+        if limit:
+            try:
+                int(limit)
+            except:
+                raise ValueError('INVALID_LIMIT')
         
         pipeline = []
 

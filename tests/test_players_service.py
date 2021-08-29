@@ -33,24 +33,60 @@ class TestPlayersService(unittest.TestCase):
         try:
             result = player_service.get_players('As', None, '1', None, None)
             assert False
-        except Exception as e:
-            assert str(e) == 'sortColumn is None'
+        except ValueError as e:
+            assert str(e) == 'INVALID_SORT_COLUMN'
+        except:
+            assert False
+
+    def test_get_players_assert_sortColumn_not_valid(self):
+        Player.objects().delete()
+        try:
+            result = player_service.get_players('As', 'invalid', '1', None, None)
+            assert False
+        except ValueError as e:
+            assert str(e) == 'INVALID_SORT_COLUMN'
+        except:
+            assert False
 
     def test_get_players_assert_sortDirection_not_none(self):
         Player.objects().delete()
         try:
             result = player_service.get_players('As', 'Player', None, None, None)
             assert False
-        except Exception as e:
-            assert str(e) == 'sortDirection is None or invalid'
+        except ValueError as e:
+            assert str(e) == 'INVALID_SORT_DIRECTION'
+        except:
+            assert False
 
     def test_get_players_assert_sortDirection_not_valid(self):
         Player.objects().delete()
         try:
-            result = player_service.get_players('As', 'Player', 'asdf', None, None)
+            result = player_service.get_players('As', 'Player', 'invalid', None, None)
             assert False
-        except Exception as e:
-            assert str(e) == 'sortDirection is None or invalid'
+        except ValueError as e:
+            assert str(e) == 'INVALID_SORT_DIRECTION'
+        except:
+            assert False
+
+    def test_get_players_assert_skip_not_valid(self):
+        Player.objects().delete()
+        try:
+            result = player_service.get_players('As', 'Player', '1', 'invalid', None)
+            assert False
+        except ValueError as e:
+            assert str(e) == 'INVALID_SKIP'
+        except:
+            assert False
+
+    def test_get_players_assert_limit_not_valid(self):
+        Player.objects().delete()
+        try:
+            result = player_service.get_players('As', 'Player', '1', None, 'invalid')
+            assert False
+        except ValueError as e:
+            assert str(e) == 'INVALID_LIMIT'
+        except:
+            assert False
     
     def test_get_players_test_empty_data(self):
         Player.objects().delete()

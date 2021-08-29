@@ -25,6 +25,35 @@ class TestPlayersController(TestCase):
     #
     ############################################
 
+
+    def test_get_players_assert_invalid_sort_column(self):
+        Player.objects().delete()
+        r = self.w.get('/players/?sortColumn=invalid', expect_errors=True)
+        assert r is not None
+        assert r.status_int == 400
+        assert r.text == 'INVALID_SORT_COLUMN'
+
+    def test_get_players_assert_invalid_sort_direction(self):
+        Player.objects().delete()
+        r = self.w.get('/players/?sortDirection=invalid', expect_errors=True)
+        assert r is not None
+        assert r.status_int == 400
+        assert r.text == 'INVALID_SORT_DIRECTION'
+
+    def test_get_players_assert_invalid_skip(self):
+        Player.objects().delete()
+        r = self.w.get('/players/?skip=invalid', expect_errors=True)
+        assert r is not None
+        assert r.status_int == 400
+        assert r.text == 'INVALID_SKIP'
+
+    def test_get_players_assert_invalid_limit(self):
+        Player.objects().delete()
+        r = self.w.get('/players/?limit=invalid', expect_errors=True)
+        assert r is not None
+        assert r.status_int == 400
+        assert r.text == 'INVALID_LIMIT'
+    
     def test_get_request_with_no_objects_loaded(self):
         Player.objects().delete()
         answer = {
