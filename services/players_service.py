@@ -6,6 +6,24 @@ from services.exceptions.load_exception import LoadException
 
 class PlayerService:
 
+    dbMap = {
+        'playerName': 'Player',
+        'teamAbbreviation': 'Team',
+        'playerPostion': 'Pos',
+        'rushingAttempts': 'Att',
+        'rushingAttG': 'Att/G',
+        'rushingYards': 'Yds',
+        'rushingAvg': 'Avg',
+        'rushingYdsG': 'Yds/G',
+        'rushingTouchdowns': 'TD',
+        'rushingLongest': 'Lng',
+        'rushingFD': '1st',
+        'rushingFDP': '1st%',
+        'rushing20plus': '20+',
+        'rushing40plus': '40+',
+        'rushingFUM': 'FUM'
+    }
+
     GET_PLAYERS_PROJECTION = { 
         '_id': 0,
         'Lng': {
@@ -94,10 +112,10 @@ class PlayerService:
             try:
                 player.validate()
             except ValidationError as e:
-                key = next((key for key in dbMap if key in e.message), None)
+                key = next((key for key in self.dbMap if key in e.message), None)
                 if not key:
                     raise e
-                raise LoadException(idx=idx, variable=dbMap[key])
+                raise LoadException(idx=idx, variable=self.dbMap[key])
             players.append(player)
         current_players.delete()
         if players: Player.objects.insert(players)
@@ -108,22 +126,3 @@ class PlayerService:
             return value
         else:
             return int(str(value).replace(',', ''))
-
-
-dbMap = {
-    'playerName': 'Player',
-    'teamAbbreviation': 'Team',
-    'playerPostion': 'Pos',
-    'rushingAttempts': 'Att',
-    'rushingAttG': 'Att/G',
-    'rushingYards': 'Yds',
-    'rushingAvg': 'Avg',
-    'rushingYdsG': 'Yds/G',
-    'rushingTouchdowns': 'TD',
-    'rushingLongest': 'Lng',
-    'rushingFD': '1st',
-    'rushingFDP': '1st%',
-    'rushing20plus': '20+',
-    'rushing40plus': '40+',
-    'rushingFUM': 'FUM'
-}
