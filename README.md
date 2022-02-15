@@ -1,7 +1,6 @@
 # TSI "the Rush" Challenge
 
-The purpose of this server is to provide endpoints in order to load and recieve player data. See,
-* [Challenge Description](https://github.com/tsicareers/nfl-rushing)
+The purpose of this server is to provide endpoints in order to load and recieve player data. See
 * [Frontend Project](https://github.com/karshh/rushing-fe)
 
 ### Installation and setup
